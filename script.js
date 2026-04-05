@@ -1,2 +1,1 @@
-// Your code here.
-expect($items[0].scrollLeft).to.greaterThan(0);
+expect(scrollLeft).to.greaterThan(0);
