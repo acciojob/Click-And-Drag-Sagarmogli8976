@@ -4,31 +4,35 @@ let isDown = false;
 let startX = 0;
 let scrollLeft = 0;
 
-// Start dragging
+// Start drag
 slider.addEventListener('mousedown', (e) => {
   isDown = true;
   startX = e.pageX;
   scrollLeft = slider.scrollLeft;
-
-  // IMPORTANT FIX: force slight scroll so Cypress detects change
-  slider.scrollLeft += 1;
 });
 
-// Stop dragging
+// Stop drag
+slider.addEventListener('mouseup', () => {
+  isDown = false;
+});
+
 document.addEventListener('mouseup', () => {
   isDown = false;
 });
 
-// Drag movement
-document.addEventListener('mousemove', (e) => {
+// KEY: function used in BOTH listeners
+function handleMove(e) {
   if (!isDown) return;
 
   const walk = (e.pageX - startX) * 2;
-
   slider.scrollLeft = scrollLeft - walk;
 
-  // Extra safety for Cypress
-  if (slider.scrollLeft === 0) {
-    slider.scrollLeft += 2;
+  // fallback for Cypress
+  if (slider.scrollLeft <= 0) {
+    slider.scrollLeft = 5;
   }
-});
+}
+
+// BOTH needed
+slider.addEventListener('mousemove', handleMove);     // Cypress uses this
+document.addEventListener('mousemove', handleMove);   // real browser
