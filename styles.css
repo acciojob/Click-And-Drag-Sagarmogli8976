@@ -27,15 +27,8 @@ body {
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
-  transition: all 0.2s;
-  transform: scale(0.98);
   position: relative;
   background: rgba(255,255,255,0.1);
-}
-
-.items.active {
-  cursor: grabbing;
-  transform: scale(1);
 }
 
 .item {

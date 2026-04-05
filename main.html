@@ -35,35 +35,6 @@
     <div class="item">25</div>
   </div>
 
-  <script>
-   const slider = document.querySelector('.items');
-
-let isDown = false;
-let startX = 0;
-let scrollLeft = 0;
-
-// Start drag
-slider.addEventListener('mousedown', (e) => {
-  isDown = true;
-  startX = e.pageX;
-  scrollLeft = slider.scrollLeft;
-});
-
-// Stop drag
-document.addEventListener('mouseup', () => {
-  isDown = false;
-});
-
-// Move (IMPORTANT: on document)
-document.addEventListener('mousemove', (e) => {
-  if (!isDown) return;
-
-  const walk = (e.pageX - startX) * 2;
-
-  // Force scroll update
-  slider.scrollLeft = scrollLeft - walk;
-});
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
