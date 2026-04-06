@@ -1,31 +1,61 @@
-const container = document.querySelector('.items');
+const container = document.getElementById('container');
+const cubes = document.querySelectorAll('.cube');
 
-let isDown = false;
-let startX;
-let scrollLeft;
+let isDragging = false;
+let currentCube = null;
+let offsetX = 0;
+let offsetY = 0;
 
-container.addEventListener('mousedown', (e) => {
-    isDown = true;
-    
-    // Record the starting X position of the mouse
-    startX = e.pageX; 
-    
-    // Record the current scroll position of the container
-    scrollLeft = container.scrollLeft;
+cubes.forEach(cube => {
+    cube.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        currentCube = cube;
+
+        // 1. Switch to absolute positioning immediately upon click
+        // This removes it from the grid and allows free movement
+        currentCube.style.position = 'absolute';
+
+        // 2. Calculate the Offset
+        // We find where the mouse is relative to the top-left corner of the cube
+        const rect = currentCube.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+    });
 });
 
 window.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
+    if (!isDragging || !currentCube) return;
 
-    // Calculate how far the mouse has moved from the start point
-    // If mouse moves left, (e.pageX - startX) is negative
-    const walk = e.pageX - startX;
-    
-    // To scroll right when moving mouse left, we subtract the walk
-    // Example: 0 - (-222) = 222 (scrollLeft increases)
-    container.scrollLeft = scrollLeft - walk;
+    // Get dimensions of the container and the cube
+    const containerRect = container.getBoundingClientRect();
+    const cubeRect = currentCube.getBoundingClientRect();
+
+    // Calculate new position relative to the container's top-left
+    let newX = e.clientX - containerRect.left - offsetX;
+    let newY = e.clientY - containerRect.top - offsetY;
+
+    // --- BOUNDARY CONSTRAINTS ---
+    // Clamp X (Left/Right)
+    if (newX < 0) {
+        newX = 0;
+    } else if (newX > containerRect.width - cubeRect.width) {
+        newX = containerRect.width - cubeRect.width;
+    }
+
+    // Clamp Y (Top/Bottom)
+    if (newY < 0) {
+        newY = 0;
+    } else if (newY > containerRect.height - cubeRect.height) {
+        newY = containerRect.height - cubeRect.height;
+    }
+
+    // Apply the coordinates
+    currentCube.style.left = `${newX}px`;
+    currentCube.style.top = `${newY}px`;
 });
 
 window.addEventListener('mouseup', () => {
-    isDown = false;
+    // Release the cube
+    isDragging = false;
+    currentCube = null;
 });
