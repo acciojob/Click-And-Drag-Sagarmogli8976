@@ -5,39 +5,43 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #f0f2f5;
-    font-family: sans-serif;
 }
 
-/* Updated selector from .container to .items */
 .items {
-    width: 600px;
-    height: 600px;
-    background-color: #ffffff;
+    width: 500px;      /* Fixed width so content can overflow */
+    height: 200px;     /* Fixed height so it's visible to Cypress */
+    background-color: white;
     border: 4px solid #333;
     border-radius: 10px;
-    position: relative; 
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-gap: 20px;
+    
+    display: flex;      /* Put cubes in a single horizontal line */
+    overflow-x: auto;   /* Enable horizontal scrolling */
+    gap: 20px;
     padding: 20px;
-    justify-items: center;
-    align-content: start;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    overflow: hidden; /* Ensures cubes don't visually bleed out */
+    cursor: grab;
+    
+    /* Hide scrollbar for a cleaner look, but keep functionality */
+    scrollbar-width: none; 
+}
+
+.items::-webkit-scrollbar {
+    display: none;
 }
 
 .cube {
-    width: 100px;
-    height: 100px;
+    min-width: 150px;   /* Large width to ensure the container scrolls */
+    height: 150px;
     background-color: #3498db;
     border-radius: 8px;
-    cursor: grab;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    user-select: none; /* Prevent text selection while dragging */
 }
 
-.cube:active {
+.items:active {
     cursor: grabbing;
-    background-color: #2980b9;
-    z-index: 10; 
 }
