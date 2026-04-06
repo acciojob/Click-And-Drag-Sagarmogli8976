@@ -6,28 +6,26 @@ let scrollLeft;
 
 container.addEventListener('mousedown', (e) => {
     isDown = true;
-    container.classList.add('active');
     
-    // Get the initial mouse position
-    startX = e.pageX - container.offsetLeft;
-    // Get the current scroll position
+    // Record the starting X position of the mouse
+    startX = e.pageX; 
+    
+    // Record the current scroll position of the container
     scrollLeft = container.scrollLeft;
 });
 
 window.addEventListener('mousemove', (e) => {
-    if (!isDown) return; // Stop function if mouse is not pressed
+    if (!isDown) return;
+
+    // Calculate how far the mouse has moved from the start point
+    // If mouse moves left, (e.pageX - startX) is negative
+    const walk = e.pageX - startX;
     
-    e.preventDefault();
-    
-    // Calculate how far the mouse has moved
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 2; // Multiply by 2 to make scrolling faster
-    
-    // Update the scrollLeft position
+    // To scroll right when moving mouse left, we subtract the walk
+    // Example: 0 - (-222) = 222 (scrollLeft increases)
     container.scrollLeft = scrollLeft - walk;
 });
 
 window.addEventListener('mouseup', () => {
     isDown = false;
-    container.classList.remove('active');
 });

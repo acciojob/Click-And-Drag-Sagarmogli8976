@@ -8,19 +8,19 @@ body {
 }
 
 .items {
-    width: 500px;      /* Fixed width so content can overflow */
-    height: 200px;     /* Fixed height so it's visible to Cypress */
+    width: 500px; 
+    height: 200px; 
     background-color: white;
     border: 4px solid #333;
     border-radius: 10px;
     
-    display: flex;      /* Put cubes in a single horizontal line */
-    overflow-x: auto;   /* Enable horizontal scrolling */
+    display: flex; 
+    overflow-x: auto; /* Required for scrollLeft to work */
     gap: 20px;
     padding: 20px;
     cursor: grab;
     
-    /* Hide scrollbar for a cleaner look, but keep functionality */
+    /* Hide scrollbar visually but keep functionality */
     scrollbar-width: none; 
 }
 
@@ -29,7 +29,8 @@ body {
 }
 
 .cube {
-    min-width: 150px;   /* Large width to ensure the container scrolls */
+    /* Ensure total width is much larger than 500px */
+    min-width: 200px; 
     height: 150px;
     background-color: #3498db;
     border-radius: 8px;
@@ -38,8 +39,8 @@ body {
     align-items: center;
     color: white;
     font-size: 24px;
-    font-weight: bold;
-    user-select: none; /* Prevent text selection while dragging */
+    user-select: none; 
+    flex-shrink: 0; /* Prevent cubes from shrinking to fit the container */
 }
 
 .items:active {
