@@ -1,43 +1,74 @@
-html {
+/* ── Reset & Base ─────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
-  background: url('https://source.unsplash.com/NFs6dRTBgaM/2000x2000') fixed;
-  background-size: cover;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-family: sans-serif;
-  margin: 0;
-}
-
-.items {
-  height: 800px;
-  padding: 100px;
-  width: 100%;
-  border: 1px solid white;
-  overflow-x: scroll;
-  overflow-y: hidden;
-  white-space: nowrap;
+  background: #f4f4f0;
+  color: #1a1a18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
   user-select: none;
-  cursor: pointer;
-  position: relative;
-  background: rgba(255,255,255,0.1);
 }
 
-.item {
-  width: 200px;
-  height: calc(100% - 40px);
-  display: inline-flex;
+/* ── Page Heading ─────────────────────────────── */
+h1 {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: #1a1a18;
+}
+
+/* ── Drag Arena ───────────────────────────────── */
+#arena {
+  position: relative;
+  width: 100%;
+  max-width: 660px;
+  height: 420px;
+  border: 1.5px dashed #b0afa8;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ── Hint Text ────────────────────────────────── */
+#hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #888780;
+  text-align: center;
+}
+
+/* ── Cube ─────────────────────────────────────── */
+.cube {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
-  margin: 0 10px;
-  background: lightblue;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: grab;
+  transition: transform 0.1s, box-shadow 0.15s;
+  z-index: 1;
+}
+
+.cube:hover {
+  transform: scale(1.05);
+}
+
+.cube.dragging {
+  cursor: grabbing;
+  transform: scale(1.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
 }
