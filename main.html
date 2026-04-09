@@ -1,21 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Draggable Cubes</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Cube Drag Arena</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Draggable Cubes</h1>
+<h2>Cube Drag Arena</h2>
+<p id="hint">Drag a cube or click it</p>
 
-  <div id="arena">
-    <!-- Cubes are injected by JavaScript -->
-  </div>
+<div id="arena">
+  <div class="cube">A</div>
+  <div class="cube">B</div>
+  <div class="cube">C</div>
+  <div class="cube">D</div>
+  <div class="cube">E</div>
+  <div class="cube">F</div>
+  <div class="cube">G</div>
+  <div class="cube">H</div>
+  <div class="cube">I</div>
+</div>
 
-  <p id="hint">Click and drag any cube within the area</p>
+<script>
+const cubes = document.querySelectorAll('.cube');
+const arena = document.getElementById('arena');
+const hint = document.getElementById('hint');
 
-  <script src="script.js"></script>
+const CUBE_SIZE = 64;
+
+cubes.forEach((cube, index) => {
+  // initial positions
+  cube.style.left = (index % 3) * 80 + "px";
+  cube.style.top  = Math.floor(index / 3) * 80 + "px";
+
+  let offsetX, offsetY, isDragging = false;
+
+  cube.addEventListener('mousedown', (e) => {
+    cube.classList.add('dragging');
+    offsetX = e.clientX - cube.offsetLeft;
+    offsetY = e.clientY - cube.offsetTop;
+    isDragging = false;
+
+    function onMouseMove(e) {
+      isDragging = true;
+
+      let x = e.clientX - offsetX;
+      let y = e.clientY - offsetY;
+
+      // Clamp inside arena
+      x = Math.max(0, Math.min(x, arena.clientWidth - CUBE_SIZE));
+      y = Math.max(0, Math.min(y, arena.clientHeight - CUBE_SIZE));
+
+      cube.style.left = x + "px";
+      cube.style.top  = y + "px";
+    }
+
+    function onMouseUp(e) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      cube.classList.remove('dragging');
+
+      if (isDragging) {
+        hint.textContent = `dropped at (${cube.offsetLeft}, ${cube.offsetTop})`;
+      } else {
+        hint.textContent = `clicked`;
+      }
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+});
+</script>
+
 </body>
 </html>
