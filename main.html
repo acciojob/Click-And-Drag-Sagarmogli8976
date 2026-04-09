@@ -57,8 +57,8 @@ cubes.forEach((cube, index) => {
     }
 
     function onMouseUp(e) {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
 
       cube.classList.remove('dragging');
 
@@ -69,8 +69,8 @@ cubes.forEach((cube, index) => {
       }
     }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   });
 });
 </script>
