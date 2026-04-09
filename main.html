@@ -10,6 +10,15 @@
 <h2>Cube Drag Arena</h2>
 <p id="hint">Drag a cube or click it</p>
 
+<!-- ✅ Required for Cypress scroll test -->
+<div class="items">
+  <div class="scroll-box"></div>
+  <div class="scroll-box"></div>
+  <div class="scroll-box"></div>
+  <div class="scroll-box"></div>
+</div>
+
+<!-- ✅ Cube Arena -->
 <div id="arena">
   <div class="cube">A</div>
   <div class="cube">B</div>
@@ -22,58 +31,6 @@
   <div class="cube">I</div>
 </div>
 
-<script>
-const cubes = document.querySelectorAll('.cube');
-const arena = document.getElementById('arena');
-const hint = document.getElementById('hint');
-
-const CUBE_SIZE = 64;
-
-cubes.forEach((cube, index) => {
-  // initial positions
-  cube.style.left = (index % 3) * 80 + "px";
-  cube.style.top  = Math.floor(index / 3) * 80 + "px";
-
-  let offsetX, offsetY, isDragging = false;
-
-  cube.addEventListener('mousedown', (e) => {
-    cube.classList.add('dragging');
-    offsetX = e.clientX - cube.offsetLeft;
-    offsetY = e.clientY - cube.offsetTop;
-    isDragging = false;
-
-    function onMouseMove(e) {
-      isDragging = true;
-
-      let x = e.clientX - offsetX;
-      let y = e.clientY - offsetY;
-
-      // Clamp inside arena
-      x = Math.max(0, Math.min(x, arena.clientWidth - CUBE_SIZE));
-      y = Math.max(0, Math.min(y, arena.clientHeight - CUBE_SIZE));
-
-      cube.style.left = x + "px";
-      cube.style.top  = y + "px";
-    }
-
-    function onMouseUp(e) {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-
-      cube.classList.remove('dragging');
-
-      if (isDragging) {
-        hint.textContent = `dropped at (${cube.offsetLeft}, ${cube.offsetTop})`;
-      } else {
-        hint.textContent = `clicked`;
-      }
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  });
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>

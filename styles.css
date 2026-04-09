@@ -3,6 +3,27 @@ body {
   text-align: center;
 }
 
+/* ✅ Scroll container */
+.items {
+  width: 300px;
+  overflow-x: scroll;
+  display: flex;
+  gap: 10px;
+  margin: 20px auto;
+  cursor: grab;
+}
+
+.items:active {
+  cursor: grabbing;
+}
+
+.scroll-box {
+  min-width: 200px;
+  height: 100px;
+  background: steelblue;
+}
+
+/* ✅ Arena */
 #arena {
   width: 400px;
   height: 400px;
@@ -12,6 +33,7 @@ body {
   background-color: #f0f0f0;
 }
 
+/* ✅ Cubes */
 .cube {
   width: 64px;
   height: 64px;
@@ -33,6 +55,7 @@ body {
   cursor: grabbing;
 }
 
+/* ✅ Hint */
 #hint {
   font-size: 18px;
   margin-top: 10px;
