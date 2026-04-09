@@ -1,144 +1,130 @@
-(function () {
+// cypress/integration/tests/test.spec.js
 
-  /* ── Configuration ───────────────────────────── */
-  const NUM_CUBES  = 9;
-  const COLS       = 3;
-  const CUBE_SIZE  = 64;   // px  (must match CSS width/height)
-  const GAP        = 20;   // px  gap between cubes in the initial grid
-  const PADDING    = 32;   // px  offset from arena edges for initial placement
+describe('Cube Drag Arena', () => {
 
-  /* ── Colour Palette ─────────────────────────── */
-  const COLORS = [
-    { bg: '#EEEDFE', border: '#534AB7', text: '#3C3489' }, // purple
-    { bg: '#E1F5EE', border: '#0F6E56', text: '#085041' }, // teal
-    { bg: '#FAECE7', border: '#993C1D', text: '#712B13' }, // coral
-    { bg: '#FBEAF0', border: '#993556', text: '#72243E' }, // pink
-    { bg: '#E6F1FB', border: '#185FA5', text: '#0C447C' }, // blue
-    { bg: '#EAF3DE', border: '#3B6D11', text: '#27500A' }, // green
-    { bg: '#FAEEDA', border: '#854F0B', text: '#633806' }, // amber
-    { bg: '#FCEBEB', border: '#A32D2D', text: '#791F1F' }, // red
-    { bg: '#F1EFE8', border: '#5F5E5A', text: '#444441' }, // gray
-  ];
+  beforeEach(() => {
+    cy.visit('/');                          // adjust to your actual URL / route
+    cy.get('#arena').should('exist');       // wait until arena is in the DOM
+    cy.get('.cube').should('have.length', 9); // all 9 cubes rendered
+  });
 
-  const LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-
-  /* ── State ───────────────────────────────────── */
-  // Each entry: { el: HTMLElement, x: number, y: number }
-  const cubes = [];
-
-  /* ── DOM References ──────────────────────────── */
-  const arena = document.getElementById('arena');
-  const hint  = document.getElementById('hint');
-
-  /* ── Initialise Cubes ────────────────────────── */
-  function initCubes() {
-    for (let i = 0; i < NUM_CUBES; i++) {
-      const col = i % COLS;
-      const row = Math.floor(i / COLS);
-
-      const x = PADDING + col * (CUBE_SIZE + GAP);
-      const y = PADDING + row * (CUBE_SIZE + GAP);
-
-      const c  = COLORS[i % COLORS.length];
-      const el = document.createElement('div');
-
-      el.className   = 'cube';
-      el.textContent = LABELS[i] || String(i + 1);
-      el.style.left        = x + 'px';
-      el.style.top         = y + 'px';
-      el.style.background  = c.bg;
-      el.style.borderColor = c.border;
-      el.style.color       = c.text;
-
-      arena.appendChild(el);
-      cubes.push({ el, x, y });
-
-      attachDrag(el, i);
-    }
-  }
-
-  /* ── Drag Logic ──────────────────────────────── */
-  function attachDrag(el, idx) {
-    let startMouseX = 0;
-    let startMouseY = 0;
-    let startCubeX  = 0;
-    let startCubeY  = 0;
-    let dragging    = false;
-    let moved       = false;
-
-    /* ---------- pointer helpers ---------- */
-    function beginDrag(clientX, clientY) {
-      dragging    = true;
-      moved       = false;
-      startMouseX = clientX;
-      startMouseY = clientY;
-      startCubeX  = cubes[idx].x;
-      startCubeY  = cubes[idx].y;
-      el.classList.add('dragging');
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!dragging) return;
-      moved = true;
-
-      const arenaRect = arena.getBoundingClientRect();
-      const dx = clientX - startMouseX;
-      const dy = clientY - startMouseY;
-
-      /* Clamp within arena bounds */
-      const maxX = arenaRect.width  - CUBE_SIZE;
-      const maxY = arenaRect.height - CUBE_SIZE;
-      const newX = Math.max(0, Math.min(startCubeX + dx, maxX));
-      const newY = Math.max(0, Math.min(startCubeY + dy, maxY));
-
-      cubes[idx].x = newX;
-      cubes[idx].y = newY;
-      el.style.left = newX + 'px';
-      el.style.top  = newY + 'px';
-    }
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      el.classList.remove('dragging');
-
-      if (!moved) {
-        hint.textContent = 'Cube ' + LABELS[idx] + ' clicked — drag to move it';
-      } else {
-        hint.textContent =
-          'Cube ' + LABELS[idx] + ' dropped at (' +
-          Math.round(cubes[idx].x) + ', ' +
-          Math.round(cubes[idx].y) + ')';
-      }
-    }
-
-    /* ---------- mouse events ---------- */
-    el.addEventListener('mousedown', function (e) {
-      e.preventDefault();
-      beginDrag(e.clientX, e.clientY);
+  /* ─────────────────────────────────────────────────
+     1. Basic render
+  ───────────────────────────────────────────────── */
+  it('renders 9 labelled cubes', () => {
+    const labels = ['A','B','C','D','E','F','G','H','I'];
+    labels.forEach((label, i) => {
+      cy.get('.cube').eq(i).should('have.text', label);
     });
+  });
 
-    document.addEventListener('mousemove', function (e) {
-      moveDrag(e.clientX, e.clientY);
+  /* ─────────────────────────────────────────────────
+     2. Click without drag → hint message
+  ───────────────────────────────────────────────── */
+  it('shows a hint message on click without drag', () => {
+    cy.get('.cube').first()
+      .trigger('mousedown', { which: 1, clientX: 100, clientY: 100 })
+      .trigger('mouseup',   { force: true });
+
+    cy.get('#hint').should('contain', 'clicked');
+  });
+
+  /* ─────────────────────────────────────────────────
+     3. Drag moves the cube (left position changes)
+  ───────────────────────────────────────────────── */
+  it('moves a cube when dragged', () => {
+    // Record starting left before drag
+    cy.get('.cube').first().then($cube => {
+      const startLeft = parseFloat($cube[0].style.left);
+
+      cy.get('.cube').first()
+        .trigger('mousedown', { which: 1, clientX: 150, clientY: 150 })
+        .trigger('mousemove', { clientX: 300, clientY: 150, force: true })
+        .trigger('mouseup',   { force: true });
+
+      cy.get('.cube').first().should($moved => {
+        const newLeft = parseFloat($moved[0].style.left);
+        expect(newLeft).to.be.greaterThan(startLeft);
+      });
     });
+  });
 
-    document.addEventListener('mouseup', endDrag);
+  /* ─────────────────────────────────────────────────
+     4. Drag shows "dropped at" hint with coordinates
+  ───────────────────────────────────────────────── */
+  it('updates hint with drop coordinates after drag', () => {
+    cy.get('.cube').first()
+      .trigger('mousedown', { which: 1, clientX: 100, clientY: 100 })
+      .trigger('mousemove', { clientX: 250, clientY: 200, force: true })
+      .trigger('mouseup',   { force: true });
 
-    /* ---------- touch events ---------- */
-    el.addEventListener('touchstart', function (e) {
-      const t = e.touches[0];
-      beginDrag(t.clientX, t.clientY);
-    }, { passive: true });
+    cy.get('#hint').should('contain', 'dropped at');
+    cy.get('#hint').should('match', /dropped at \(\d+, \d+\)/);
+  });
 
-    document.addEventListener('touchmove', function (e) {
-      const t = e.touches[0];
-      moveDrag(t.clientX, t.clientY);
-    }, { passive: true });
+  /* ─────────────────────────────────────────────────
+     5. Cube stays within arena bounds after drag
+  ───────────────────────────────────────────────── */
+  it('clamps cube inside arena boundaries', () => {
+    cy.get('#arena').then($arena => {
+      const arenaW = $arena[0].offsetWidth;
+      const arenaH = $arena[0].offsetHeight;
 
-    document.addEventListener('touchend', endDrag);
-  }
+      // Try to drag way outside the arena to the right/bottom
+      cy.get('.cube').first()
+        .trigger('mousedown', { which: 1, clientX: 50, clientY: 50 })
+        .trigger('mousemove', { clientX: 9999, clientY: 9999, force: true })
+        .trigger('mouseup',   { force: true });
 
-  /* ── Bootstrap ───────────────────────────────── */
-  initCubes();
+      cy.get('.cube').first().should($cube => {
+        const left = parseFloat($cube[0].style.left);
+        const top  = parseFloat($cube[0].style.top);
+        expect(left).to.be.at.most(arenaW  - 64); // CUBE_SIZE = 64
+        expect(top ).to.be.at.most(arenaH  - 64);
+        expect(left).to.be.at.least(0);
+        expect(top ).to.be.at.least(0);
+      });
+    });
+  });
 
-})();
+  /* ─────────────────────────────────────────────────
+     6. Multiple cubes can be dragged independently
+  ───────────────────────────────────────────────── */
+  it('moves each cube independently', () => {
+    // Drag cube A (index 0)
+    cy.get('.cube').eq(0)
+      .trigger('mousedown', { which: 1, clientX: 100, clientY: 100 })
+      .trigger('mousemove', { clientX: 300, clientY: 100, force: true })
+      .trigger('mouseup',   { force: true });
+
+    // Drag cube B (index 1)
+    cy.get('.cube').eq(1)
+      .trigger('mousedown', { which: 1, clientX: 200, clientY: 100 })
+      .trigger('mousemove', { clientX: 200, clientY: 300, force: true })
+      .trigger('mouseup',   { force: true });
+
+    // Cube A moved right, cube B moved down — positions differ
+    cy.get('.cube').eq(0).then($a => {
+      cy.get('.cube').eq(1).then($b => {
+        const leftA = parseFloat($a[0].style.left);
+        const topB  = parseFloat($b[0].style.top);
+        expect(leftA).to.be.greaterThan(100);
+        expect(topB ).to.be.greaterThan(100);
+      });
+    });
+  });
+
+  /* ─────────────────────────────────────────────────
+     7. dragging class is added/removed correctly
+  ───────────────────────────────────────────────── */
+  it('adds dragging class on mousedown and removes on mouseup', () => {
+    cy.get('.cube').first()
+      .trigger('mousedown', { which: 1, clientX: 100, clientY: 100 })
+      .should('have.class', 'dragging');
+
+    cy.get('.cube').first()
+      .trigger('mouseup', { force: true })
+      .should('not.have.class', 'dragging');
+  });
+
+});
